@@ -22,14 +22,12 @@ function! s:RunCheckstyle()
 	\  shellescape(g:Checkstyle_XML),
 	\  shellescape(expand("%:p")))
     let output = system(checkstyle_cmd)
-    if v:shell_error != 0
-      echohl ErrorMsg | echo iconv(output, 'default', &encoding) | echohl None
-      return
-    endif
     set errorformat=%f:%l:%c:\ %m,%f:%l:\ %m,%-G%.%#
     cexpr output
     if len(getqflist()) > 0
       copen | cc
+    elseif v:shell_error != 0
+      echohl ErrorMsg | echo output | echohl None
     else
       cclose
     endif
