@@ -13,14 +13,19 @@ if !exists("Checkstyle_XML")
   let Checkstyle_XML = globpath(&rtp, 'lib/sun_checks.xml')
 endif
 
+function! s:shellescape(x)
+  let quote = &shellxquote == '"' ?  "'" : '"'
+  return quote . fnameescape(a:x) . quote
+endfunction
+
 function! s:RunCheckstyle()
   let old_errorformat = &errorformat
   try
     let checkstyle_cmd = printf('java -cp %s %s -c %s %s',
-	\  shellescape(g:Checkstyle_Classpath),
+	\  s:shellescape(g:Checkstyle_Classpath),
 	\  "com.puppycrawl.tools.checkstyle.Main",
-	\  shellescape(g:Checkstyle_XML),
-	\  shellescape(expand("%:p")))
+	\  s:shellescape(g:Checkstyle_XML),
+	\  s:shellescape(expand("%:p")))
     let output = system(checkstyle_cmd)
     set errorformat=%f:%l:%c:\ %m,%f:%l:\ %m,%-G%.%#
     cexpr output
